@@ -34,6 +34,11 @@ export default class FlowGraph {
         global: true,
         escape: true // 点击 esc 时是否终止连线、移动等交互
       },
+      clipboard: {
+        enabled: true, // 是否开启复制粘贴
+        offset: 30,
+        useLocalStorage: true,
+      },
       panning: true,
       connecting: {
         snap: true,
