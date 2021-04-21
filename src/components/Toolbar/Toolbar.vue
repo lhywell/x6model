@@ -16,12 +16,13 @@
           }
         " class="el-icon-zoom-out" title="缩小"></i>
     <span class="line"></span>
-    <i class="iconfont iconcopy" title="复制"></i>
-    <i class="iconfont iconcut" title="剪切"></i>
-    <i class="iconfont iconpaste" title="粘贴"></i>
+    <i class="iconfont iconcopy" title="复制" @click="copy"></i>
+    <i class="iconfont iconcut" title="剪切" @click="cut"></i>
+    <i class="iconfont iconpaste" title="粘贴" @click="paste"></i>
     <span class="line"></span>
     <i class="iconfont iconsave" @click="save" title="保存"></i>
     <i class="iconfont iconinterface_printer_line" @click="print" title="打印"></i>
+    <span class="toJSON" @click="toJSON" title="toJSON">toJSON</span>
   </div>
 </template>
 <script>
@@ -32,39 +33,7 @@ export default {
   data() {
     return {};
   },
-  updated() {
-    // const { graph } = FlowGraph
-    // const { history } = graph
-    // setCanUndo(history.canUndo())
-    // setCanRedo(history.canRedo())
-    // history.on('change', () => {
-    //   setCanUndo(history.canUndo())
-    //   setCanRedo(history.canRedo())
-    // })
-
-    this.$nextTick(() => {
-      console.log(this.$graph)
-      this.$graph.bindKey(['meta+d', 'ctrl+d'], this.clear)
-
-      // this.$graph.bindKey(['meta+z', 'ctrl+z'], e => {
-      //   this.undo();
-      // }）
-      this.$graph.bindKey(['ctrl+z'], e => { this.undo() }, "keyup");
-      this.$graph.bindKey(['meta+shift+z', 'ctrl+y'], this.redo)
-
-      this.$graph.bindKey(['meta+s', 'ctrl+s'], this.save)
-
-      this.$graph.bindKey(['meta+c', 'ctrl+c'], e => {
-        console.log(222)
-        this.copy()
-      }, "keyup")
-      this.$graph.bindKey(['meta+v', 'ctrl+v'], this.paste)
-      this.$graph.bindKey(['meta+x', 'ctrl+x'], this.cut)
-
-      this.$graph.bindKey(['meta+p', 'ctrl+p'], this.print)
-    })
-
-  },
+  mounted() {},
   methods: {
     clear() {
       this.$graph.clearCells()
@@ -78,25 +47,28 @@ export default {
     },
     copy() {
       const cells = this.$graph.getSelectedCells()
-      if (cells.length) {
+      if (cells && cells.length) {
         this.$graph.copy(cells)
+        this.$message.success('复制成功')
+      } else {
+        this.$message.info('请先选中节点再复制')
       }
-      return false
     },
     cut() {
       const cells = this.$graph.getSelectedCells()
       if (cells.length) {
         this.$graph.cut(cells)
       }
-      return false
     },
     paste() {
-      if (!this.$graph.isClipboardEmpty()) {
-        const cells = this.$graph.paste({ offset: 32 })
+      if (this.$graph.isClipboardEmpty()) {
+        this.$message.info('剪切板为空，不可粘贴')
+      } else {
+        const cells = this.$graph.paste(this.options)
         this.$graph.cleanSelection()
         this.$graph.select(cells)
+        this.$message.success('粘贴成功')
       }
-      return false
     },
     scaleView(e, flag) {
       e.preventDefault();
@@ -110,10 +82,30 @@ export default {
       this.$graph.toPNG((datauri) => {
         DataUri.downloadDataUri(datauri, 'chart.png')
       })
+      // this.$graph.toJPEG((datauri) => {
+      //   DataUri.downloadDataUri(datauri, 'chart.jpeg')
+      // })
+      // this.$graph.toDataURL((datauri) => {
+      //   console.log(datauri)
+      // }, {
+      //   padding: {
+      //     top: 20,
+      //     right: 30,
+      //     bottom: 40,
+      //     left: 50,
+      //   }
+      // })
+      // this.$graph.toSVG((datauri) => {
+      //   DataUri.downloadDataUri(DataUri.svgToDataUrl(datauri), 'chart.svg')
+      // })
     },
     print() {
       this.$graph.printPreview()
     },
+    toJSON() {
+      console.log(this.$graph.toJSON())
+      // graph.fromJSON({cells:[graph.toJSON().cells[0],graph.toJSON().cells[1]]})
+    }
   }
 };
 
@@ -150,6 +142,15 @@ export default {
     background-color: rgba(0, 0, 0, .15);
     content: " ";
     pointer-events: none;
+  }
+
+  .toJSON {
+    background: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    cursor: pointer;
   }
 }
 
