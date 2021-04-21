@@ -85,16 +85,20 @@ export default {
 
       this.$refs.stencilContainer.appendChild(stencil.container)
 
-      const r1 = this.newImage('table-1', 'http://localhost:8080/table.svg')
-      const r2 = this.newImage('table-2', 'http://localhost:8080/table.svg')
-      const r3 = this.newImage('table-3', 'http://localhost:8080/table.svg')
-      const r4 = this.newImage('table-4', 'http://localhost:8080/table.svg')
+      let path = process.env.NODE_ENV === 'production' ?
+        '/x6model/dist/' :
+        '/';
 
-      const s1 = this.newImage('image-1', 'http://localhost:8080/bu.svg')
-      const s2 = this.newImage('image-2', 'http://localhost:8080/cha.svg')
-      const s3 = this.newImage('image-3', 'http://localhost:8080/fliter.svg')
-      const s4 = this.newImage('image-4', 'http://localhost:8080/jiao.svg')
-      const s5 = this.newImage('image-5', 'http://localhost:8080/bing.svg')
+      const r1 = this.newImage('table-1', path + 'table.svg')
+      const r2 = this.newImage('table-2', path + 'table.svg')
+      const r3 = this.newImage('table-3', path + 'table.svg')
+      const r4 = this.newImage('table-4', path + 'table.svg')
+
+      const s1 = this.newImage('image-1', path + 'bu.svg')
+      const s2 = this.newImage('image-2', path + 'cha.svg')
+      const s3 = this.newImage('image-3', path + 'fliter.svg')
+      const s4 = this.newImage('image-4', path + 'jiao.svg')
+      const s5 = this.newImage('image-5', path + 'bing.svg')
 
 
       stencil.load([r1, r2, r3, r4], 'group1')
