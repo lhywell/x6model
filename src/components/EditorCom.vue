@@ -73,21 +73,32 @@ export default {
         // search: true,
         collapsable: true,
         stencilGraphWidth: 200,
-        stencilGraphHeight: 180,
+        stencilGraphHeight: 280,
         groups: [{
           name: 'group1',
-          title: '功能1',
-        }, ],
+          title: '数据源',
+        }, {
+          name: 'group2',
+          title: '基础模型',
+        }],
       })
 
       this.$refs.stencilContainer.appendChild(stencil.container)
 
-      const r = this.newImage('image-1', 'https://gw.alipayobjects.com/os/s/prod/antv/assets/image/logo-with-text-73b8a.svg')
+      const r1 = this.newImage('table-1', 'http://localhost:8080/table.svg')
+      const r2 = this.newImage('table-2', 'http://localhost:8080/table.svg')
+      const r3 = this.newImage('table-3', 'http://localhost:8080/table.svg')
+      const r4 = this.newImage('table-4', 'http://localhost:8080/table.svg')
 
-      const s = this.newImage('image-2', 'https://gw.alipayobjects.com/zos/basement_prod/42d17359-8607-4227-af93-7509eabb3163.svg')
+      const s1 = this.newImage('image-1', 'http://localhost:8080/bu.svg')
+      const s2 = this.newImage('image-2', 'http://localhost:8080/cha.svg')
+      const s3 = this.newImage('image-3', 'http://localhost:8080/fliter.svg')
+      const s4 = this.newImage('image-4', 'http://localhost:8080/jiao.svg')
+      const s5 = this.newImage('image-5', 'http://localhost:8080/bing.svg')
 
 
-      stencil.load([r, s], 'group1')
+      stencil.load([r1, r2, r3, r4], 'group1')
+      stencil.load([s1, s2, s3, s4, s5], 'group2')
     },
     initKey(graph) {
       // https://craig.is/killing/mice
@@ -201,8 +212,6 @@ export default {
           this.showAttrConfig = false;
         }
       });
-
-
 
       // 增加选中Node样式
       function reset() {
@@ -324,6 +333,7 @@ export default {
 <style lang="scss">
 .editor {
   text-align: left;
+  height: 800px;
 
   h1 {
     font-size: 18px;

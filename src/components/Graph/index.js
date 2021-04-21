@@ -5,8 +5,10 @@ export default class FlowGraph {
     this.graph = null
   }
   init() {
+    let h = document.documentElement.clientHeight - 48 - 39
     let option = {
       container: document.getElementById('app-content'),
+      height: h,
       history: true, //开启画布撤销/重做能力
       grid: {
         size: 10,
