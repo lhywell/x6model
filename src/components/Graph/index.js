@@ -156,7 +156,7 @@ export default class FlowGraph {
     this.graph.centerContent()
 
     // 反序列化
-    this.initGraphShape()
+    // this.initGraphShape()
 
     this.initStencil()
     this.initEvent()
