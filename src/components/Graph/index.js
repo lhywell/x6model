@@ -1,11 +1,11 @@
-import { Graph } from '@antv/x6';
+import { Graph, DataUri, FunctionExt } from '@antv/x6';
 import graphData from './data'
 
 export default class FlowGraph {
   constructor(opts) {
     this.graph = null
   }
-  init() {
+  static init() {
     let h = document.documentElement.clientHeight - 48 - 39
     let option = {
       container: document.getElementById('app-content'),
@@ -45,11 +45,11 @@ export default class FlowGraph {
       },
       panning: true,
       connecting: {
-        snap: true,
-        allowBlank: false,
-        allowLoop: false,
-        allowNode: false,
-        highlight: true,
+        snap: true, //自动吸附
+        allowBlank: false, //是否允许连接到画布空白位置的点
+        allowLoop: false, //是否允许创建循环连线
+        allowNode: false, //是否允许边链接到节点
+        highlight: true, //拖动边时，是否高亮显示所有可用的连接桩或节点
         connector: {
           name: 'smooth', //连接线平滑normal | smooth | rounded | jumpover
         },
@@ -154,8 +154,182 @@ export default class FlowGraph {
     this.graph.centerContent()
 
     // 反序列化
-    this.graph.fromJSON(graphData);
+    this.initGraphShape()
+
+    this.initEvent()
+    this.initKey()
 
     return this.graph
+  }
+  static initGraphShape() {
+    this.graph.fromJSON(graphData)
+  }
+  static initKey() {
+    const { graph } = this;
+    // https://craig.is/killing/mice
+    // mousetrap
+    graph.bindKey(['meta+d', 'ctrl+d'], e => {
+      graph.clearCells();
+      return false
+    }, "keyup")
+
+    graph.bindKey(['ctrl+z'], e => {
+      graph.undo();
+      return false
+    }, "keyup");
+
+    graph.bindKey(['meta+shift+z', 'ctrl+y'], e => {
+      graph.redo();
+      return false
+    })
+
+    graph.bindKey(["ctrl+="], e => graph.zoom(0.1));
+    graph.bindKey(["ctrl+-"], e => graph.zoom(-0.1));
+
+    graph.bindKey(['meta+c', 'ctrl+c'], e => {
+      const cells = graph.getSelectedCells()
+      if (cells.length) {
+        graph.copy(cells)
+      }
+      return false
+    }, "keyup")
+
+    graph.bindKey(['meta+v', 'ctrl+v'], e => {
+      if (!graph.isClipboardEmpty()) {
+        const cells = graph.paste({ offset: 32 })
+        graph.cleanSelection()
+        graph.select(cells)
+      }
+      return false
+    })
+    graph.bindKey(['meta+x', 'ctrl+x'], e => {
+      const cells = graph.getSelectedCells()
+      if (cells.length) {
+        graph.cut(cells)
+      }
+      return false
+    })
+
+    graph.bindKey(['meta+s', 'ctrl+s'], e => {
+      graph.toPNG((datauri) => {
+        DataUri.downloadDataUri(datauri, 'chart.png')
+      })
+      return false
+    })
+
+    graph.bindKey(['meta+p', 'ctrl+p'], e => {
+      graph.printPreview()
+    })
+  }
+  static initEvent() {
+    const { graph } = this;
+    // graph.on("selection:changed", data => {
+    //   // if (data.selected.length === 0) {
+    //   //   this.showAttrConfig = false
+    //   // } else {
+    //   //   this.showAttrConfig = true
+    //   //   let cell = data.selected[0]
+    //   //   this.nodeFrmData = Object.assign(cell.data || {}, {
+    //   //     isNode: cell._isNode,
+    //   //     isEdge: cell._isEdge
+    //   //   })
+    //   // }
+    // });
+    // graph.on("mouseEvent", data => {
+    //   let e = data.e;
+    //   switch (data.eventName) {
+    //     case "mouseDown":
+    //       this.mouseDownMoveFlag = !e.state;
+    //       // 记录点击位置
+    //       this.mouseDownPos = e;
+    //       break;
+    //     case "mouseUp":
+    //       this.mouseDownMoveFlag = false;
+    //       // 一次移动结束，记录最终view偏移量
+    //       this.viewTranslate = Object.assign({}, this.viewOffset);
+    //       break;
+    //     case "mouseMove":
+
+    //       if (this.mouseDownMoveFlag) {
+    //         let vt = this.viewTranslate;
+    //         // 设置偏移位置
+    //         let tx = e.graphX - this.mouseDownPos.graphX + vt.graphX || 0;
+    //         let ty = e.graphY - this.mouseDownPos.graphY + vt.graphY || 0;
+    //         // 保存view偏移量
+    //         this.viewOffset = { graphX: tx, graphY: ty };
+    //         graph.getView().setTranslate(tx, ty);
+    //       }
+    //       break;
+
+    //     default:
+    //       break;
+    //   }
+    // });
+    // graph.on("click", ev => {
+    //   let cell = ev.cell;
+    //   if (cell) {
+    //     this.showAttrConfig = true;
+    //     this.nodeFrmData = Object.assign(cell.data || {}, {
+    //       isNode: cell._isNode,
+    //       isEdge: cell._isEdge
+    //     });
+    //   } else {
+    //     this.showAttrConfig = false;
+    //   }
+    // });
+
+    // 增加选中Node|Edge样式
+    function reset() {
+      // graph.drawBackground({ color: '#fff' })
+      const nodes = graph.getNodes()
+      const edges = graph.getEdges()
+
+      nodes.forEach((node) => {
+        node.attr('rect/stroke', '#108ee9')
+      })
+
+      edges.forEach((edge) => {
+        edge.attr('line/stroke', '#000000')
+        // edge.prop('labels/0', {
+        //   attrs: {
+        //     body: {
+        //       stroke: '#7c68fc',
+        //     },
+        //   },
+        // })
+      })
+    }
+
+    graph.on('edge:click', ({ edge }) => {
+      reset()
+      edge.attr('line/stroke', 'orange')
+    })
+    graph.on('node:click', ({ node }) => {
+      reset()
+    })
+
+    const container = document.getElementById('app-content')
+
+    graph.on(
+      'node:mouseenter',
+      FunctionExt.debounce(() => {
+        const ports = container.querySelectorAll(
+          '.x6-port-body'
+        )
+        this.showPorts(ports, true)
+      }),
+      500
+    )
+    graph.on('node:mouseleave', () => {
+      const ports = container.querySelectorAll(
+        '.x6-port-body'
+      )
+      this.showPorts(ports, false)
+    })
+  }
+  static showPorts(ports, show) {
+    for (let i = 0, len = ports.length; i < len; i = i + 1) {
+      ports[i].style.visibility = show ? 'visible' : 'hidden'
+    }
   }
 }

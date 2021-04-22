@@ -37,7 +37,7 @@ import FlowGraph from './Graph'
 import Modal from "./Modal";
 import Toolbar from './Toolbar/Toolbar.vue'
 
-import { Graph, Shape, Addon, DataUri, FunctionExt } from '@antv/x6';
+import { Graph, Shape, Addon } from '@antv/x6';
 const { Stencil } = Addon
 const { BorderedImage } = Shape
 
@@ -56,12 +56,11 @@ export default {
   methods: {
     initRight() {
 
-      let g = new FlowGraph()
-      let graph = g.init();
+      // let g = new FlowGraph()
+      let graph = FlowGraph.init();
 
       this.initStencil(graph);
-      this.initEvent(graph)
-      this.initKey(graph)
+
 
       Vue.prototype.$graph = graph;
 
@@ -88,7 +87,6 @@ export default {
       let path = process.env.NODE_ENV === 'production' ?
         '/x6model/dist/' :
         '/';
-
       const r1 = this.newImage('table-1', path + 'table.svg')
       const r2 = this.newImage('table-2', path + 'table.svg')
       const r3 = this.newImage('table-3', path + 'table.svg')
@@ -104,168 +102,7 @@ export default {
       stencil.load([r1, r2, r3, r4], 'group1')
       stencil.load([s1, s2, s3, s4, s5], 'group2')
     },
-    initKey(graph) {
-      // https://craig.is/killing/mice
-      // mousetrap
-      graph.bindKey(['meta+d', 'ctrl+d'], e => {
-        graph.clearCells();
-        return false
-      }, "keyup")
 
-      graph.bindKey(['ctrl+z'], e => {
-        graph.undo();
-        return false
-      }, "keyup");
-
-      graph.bindKey(['meta+shift+z', 'ctrl+y'], e => {
-        graph.redo();
-        return false
-      })
-
-      graph.bindKey(["ctrl+="], e => graph.zoom(0.1));
-      graph.bindKey(["ctrl+-"], e => graph.zoom(-0.1));
-
-      graph.bindKey(['meta+c', 'ctrl+c'], e => {
-        const cells = graph.getSelectedCells()
-        if (cells.length) {
-          graph.copy(cells)
-        }
-        return false
-      }, "keyup")
-
-      graph.bindKey(['meta+v', 'ctrl+v'], e => {
-        if (!graph.isClipboardEmpty()) {
-          const cells = graph.paste({ offset: 32 })
-          graph.cleanSelection()
-          graph.select(cells)
-        }
-        return false
-      })
-      graph.bindKey(['meta+x', 'ctrl+x'], e => {
-        const cells = graph.getSelectedCells()
-        if (cells.length) {
-          graph.cut(cells)
-        }
-        return false
-      })
-
-      graph.bindKey(['meta+s', 'ctrl+s'], e => {
-        graph.toPNG((datauri) => {
-          DataUri.downloadDataUri(datauri, 'chart.png')
-        })
-        return false
-      })
-
-      graph.bindKey(['meta+p', 'ctrl+p'], e => {
-        graph.printPreview()
-      })
-    },
-    initEvent(graph) {
-      // graph.on("selection:changed", data => {
-      //   // if (data.selected.length === 0) {
-      //   //   this.showAttrConfig = false
-      //   // } else {
-      //   //   this.showAttrConfig = true
-      //   //   let cell = data.selected[0]
-      //   //   this.nodeFrmData = Object.assign(cell.data || {}, {
-      //   //     isNode: cell._isNode,
-      //   //     isEdge: cell._isEdge
-      //   //   })
-      //   // }
-      // });
-      // graph.on("mouseEvent", data => {
-      //   let e = data.e;
-      //   switch (data.eventName) {
-      //     case "mouseDown":
-      //       this.mouseDownMoveFlag = !e.state;
-      //       // 记录点击位置
-      //       this.mouseDownPos = e;
-      //       break;
-      //     case "mouseUp":
-      //       this.mouseDownMoveFlag = false;
-      //       // 一次移动结束，记录最终view偏移量
-      //       this.viewTranslate = Object.assign({}, this.viewOffset);
-      //       break;
-      //     case "mouseMove":
-
-      //       if (this.mouseDownMoveFlag) {
-      //         let vt = this.viewTranslate;
-      //         // 设置偏移位置
-      //         let tx = e.graphX - this.mouseDownPos.graphX + vt.graphX || 0;
-      //         let ty = e.graphY - this.mouseDownPos.graphY + vt.graphY || 0;
-      //         // 保存view偏移量
-      //         this.viewOffset = { graphX: tx, graphY: ty };
-      //         graph.getView().setTranslate(tx, ty);
-      //       }
-      //       break;
-
-      //     default:
-      //       break;
-      //   }
-      // });
-      // graph.on("click", ev => {
-      //   let cell = ev.cell;
-      //   if (cell) {
-      //     this.showAttrConfig = true;
-      //     this.nodeFrmData = Object.assign(cell.data || {}, {
-      //       isNode: cell._isNode,
-      //       isEdge: cell._isEdge
-      //     });
-      //   } else {
-      //     this.showAttrConfig = false;
-      //   }
-      // });
-
-      // 增加选中Node|Edge样式
-      function reset() {
-        // graph.drawBackground({ color: '#fff' })
-        const nodes = graph.getNodes()
-        const edges = graph.getEdges()
-
-        nodes.forEach((node) => {
-          node.attr('rect/stroke', '#108ee9')
-        })
-
-        edges.forEach((edge) => {
-          edge.attr('line/stroke', '#000000')
-          // edge.prop('labels/0', {
-          //   attrs: {
-          //     body: {
-          //       stroke: '#7c68fc',
-          //     },
-          //   },
-          // })
-        })
-      }
-
-
-      graph.on('edge:click', ({ edge }) => {
-        reset()
-        edge.attr('line/stroke', 'orange')
-      })
-      graph.on('node:click', ({ node }) => {
-        reset()
-      })
-
-      const container = document.getElementById('app-content')
-
-      graph.on(
-        'node:mouseenter',
-        FunctionExt.debounce(() => {
-          const ports = container.querySelectorAll(
-            '.x6-port-body'
-          )
-          this.showPorts(ports, true)
-        }),
-        500
-      )
-      graph.on('node:mouseleave', () => {
-        const ports = container.querySelectorAll(
-          '.x6-port-body'
-        )
-        this.showPorts(ports, false)
-      })
-    },
     newImage(id, url, text) {
       return new BorderedImage({
         shape: 'image-bordered',
@@ -335,11 +172,6 @@ export default {
           ],
         },
       })
-    },
-    showPorts(ports, show) {
-      for (let i = 0, len = ports.length; i < len; i = i + 1) {
-        ports[i].style.visibility = show ? 'visible' : 'hidden'
-      }
     },
     close() {
       this.showAttrConfig = false;
