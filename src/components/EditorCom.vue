@@ -94,11 +94,11 @@ export default {
       const r3 = this.newImage('table-3', path + 'table.svg')
       const r4 = this.newImage('table-4', path + 'table.svg')
 
-      const s1 = this.newImage('image-1', path + 'bu.svg')
-      const s2 = this.newImage('image-2', path + 'cha.svg')
-      const s3 = this.newImage('image-3', path + 'fliter.svg')
-      const s4 = this.newImage('image-4', path + 'jiao.svg')
-      const s5 = this.newImage('image-5', path + 'bing.svg')
+      const s3 = this.newImage('image-1', path + 'fliter.svg', '差集')
+      const s4 = this.newImage('image-2', path + 'jiao.svg', '交集')
+      const s5 = this.newImage('image-3', path + 'bing.svg', '并集')
+      const s1 = this.newImage('image-4', path + 'bu.svg', '补集')
+      const s2 = this.newImage('image-5', path + 'cha.svg', '差集')
 
 
       stencil.load([r1, r2, r3, r4], 'group1')
@@ -142,15 +142,15 @@ export default {
         return false
       })
       graph.bindKey(['meta+x', 'ctrl+x'], e => {
-        const cells = this.$graph.getSelectedCells()
+        const cells = graph.getSelectedCells()
         if (cells.length) {
-          this.$graph.cut(cells)
+          graph.cut(cells)
         }
         return false
       })
 
       graph.bindKey(['meta+s', 'ctrl+s'], e => {
-        this.$graph.toPNG((datauri) => {
+        graph.toPNG((datauri) => {
           DataUri.downloadDataUri(datauri, 'chart.png')
         })
         return false
@@ -161,65 +161,64 @@ export default {
       })
     },
     initEvent(graph) {
-      graph.on("selection:changed", data => {
-        console.log("graph up", data);
-        // if (data.selected.length === 0) {
-        //   this.showAttrConfig = false
-        // } else {
-        //   this.showAttrConfig = true
-        //   let cell = data.selected[0]
-        //   this.nodeFrmData = Object.assign(cell.data || {}, {
-        //     isNode: cell._isNode,
-        //     isEdge: cell._isEdge
-        //   })
-        // }
-      });
-      graph.on("mouseEvent", data => {
-        let e = data.e;
-        switch (data.eventName) {
-          case "mouseDown":
-            this.mouseDownMoveFlag = !e.state;
-            // 记录点击位置
-            this.mouseDownPos = e;
-            break;
-          case "mouseUp":
-            this.mouseDownMoveFlag = false;
-            // 一次移动结束，记录最终view偏移量
-            this.viewTranslate = Object.assign({}, this.viewOffset);
-            break;
-          case "mouseMove":
+      // graph.on("selection:changed", data => {
+      //   // if (data.selected.length === 0) {
+      //   //   this.showAttrConfig = false
+      //   // } else {
+      //   //   this.showAttrConfig = true
+      //   //   let cell = data.selected[0]
+      //   //   this.nodeFrmData = Object.assign(cell.data || {}, {
+      //   //     isNode: cell._isNode,
+      //   //     isEdge: cell._isEdge
+      //   //   })
+      //   // }
+      // });
+      // graph.on("mouseEvent", data => {
+      //   let e = data.e;
+      //   switch (data.eventName) {
+      //     case "mouseDown":
+      //       this.mouseDownMoveFlag = !e.state;
+      //       // 记录点击位置
+      //       this.mouseDownPos = e;
+      //       break;
+      //     case "mouseUp":
+      //       this.mouseDownMoveFlag = false;
+      //       // 一次移动结束，记录最终view偏移量
+      //       this.viewTranslate = Object.assign({}, this.viewOffset);
+      //       break;
+      //     case "mouseMove":
 
-            if (this.mouseDownMoveFlag) {
-              let vt = this.viewTranslate;
-              // 设置偏移位置
-              let tx = e.graphX - this.mouseDownPos.graphX + vt.graphX || 0;
-              let ty = e.graphY - this.mouseDownPos.graphY + vt.graphY || 0;
-              // 保存view偏移量
-              this.viewOffset = { graphX: tx, graphY: ty };
-              graph.getView().setTranslate(tx, ty);
-            }
-            break;
+      //       if (this.mouseDownMoveFlag) {
+      //         let vt = this.viewTranslate;
+      //         // 设置偏移位置
+      //         let tx = e.graphX - this.mouseDownPos.graphX + vt.graphX || 0;
+      //         let ty = e.graphY - this.mouseDownPos.graphY + vt.graphY || 0;
+      //         // 保存view偏移量
+      //         this.viewOffset = { graphX: tx, graphY: ty };
+      //         graph.getView().setTranslate(tx, ty);
+      //       }
+      //       break;
 
-          default:
-            break;
-        }
-      });
-      graph.on("click", ev => {
-        let cell = ev.cell;
-        if (cell) {
-          this.showAttrConfig = true;
-          this.nodeFrmData = Object.assign(cell.data || {}, {
-            isNode: cell._isNode,
-            isEdge: cell._isEdge
-          });
-        } else {
-          this.showAttrConfig = false;
-        }
-      });
+      //     default:
+      //       break;
+      //   }
+      // });
+      // graph.on("click", ev => {
+      //   let cell = ev.cell;
+      //   if (cell) {
+      //     this.showAttrConfig = true;
+      //     this.nodeFrmData = Object.assign(cell.data || {}, {
+      //       isNode: cell._isNode,
+      //       isEdge: cell._isEdge
+      //     });
+      //   } else {
+      //     this.showAttrConfig = false;
+      //   }
+      // });
 
-      // 增加选中Node样式
+      // 增加选中Node|Edge样式
       function reset() {
-        graph.drawBackground({ color: '#fff' })
+        // graph.drawBackground({ color: '#fff' })
         const nodes = graph.getNodes()
         const edges = graph.getEdges()
 
@@ -228,39 +227,47 @@ export default {
         })
 
         edges.forEach((edge) => {
-          edge.attr('line/stroke', '#108ee9')
-          edge.prop('labels/0', {
-            attrs: {
-              body: {
-                stroke: '#108ee9',
-              },
-            },
-          })
+          edge.attr('line/stroke', '#000000')
+          // edge.prop('labels/0', {
+          //   attrs: {
+          //     body: {
+          //       stroke: '#7c68fc',
+          //     },
+          //   },
+          // })
         })
       }
-      this.graph = graph;
 
+
+      graph.on('edge:click', ({ edge }) => {
+        reset()
+        edge.attr('line/stroke', 'orange')
+      })
       graph.on('node:click', ({ node }) => {
         reset()
-        node.attr('rect/stroke', 'orange')
       })
     },
-    newImage(id, url) {
+    newImage(id, url, text) {
       return new BorderedImage({
         shape: 'image-bordered',
-        width: 94,
+        width: 40,
         height: 40,
         data: {
           id: id
         },
         attrs: {
-          rect: { stroke: '#108ee9', strokeWidth: 2 },
+          rect: { stroke: '#108ee9', strokeWidth: 1 },
           image: {
             opacity: 1, // 设置为透明避免闪动，图片加载完成后设置为 1
             'xlink:href': url,
           },
           body: {
             magnet: false,
+          },
+          label: {
+            text: text || '',
+            fill: 'black',
+            y: 34,
           },
         },
         ports: {
@@ -270,10 +277,10 @@ export default {
               position: 'left',
               attrs: {
                 circle: {
-                  r: 6,
+                  r: 4,
                   magnet: true,
                   stroke: '#31d0c6',
-                  strokeWidth: 2,
+                  strokeWidth: 1,
                   fill: '#fff',
                 },
               },
@@ -283,10 +290,10 @@ export default {
               position: 'right',
               attrs: {
                 circle: {
-                  r: 6,
+                  r: 4,
                   magnet: true,
                   stroke: '#31d0c6',
-                  strokeWidth: 2,
+                  strokeWidth: 1,
                   fill: '#fff',
                 },
               },
