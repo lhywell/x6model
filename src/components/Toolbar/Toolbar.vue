@@ -24,10 +24,11 @@
     <i class="iconfont iconsave" @click="save" title="保存"></i>
     <i class="iconfont iconinterface_printer_line" @click="print" title="打印"></i>
     <span class="toJSON" @click="toJSON" title="toJSON">toJSON</span>
+    <span class="run" @click="runJSON" title="运行">运行</span>
   </div>
 </template>
 <script>
-import { DataUri } from '@antv/x6'
+import { DataUri, Edge } from '@antv/x6'
 
 export default {
   name: 'Toolbar',
@@ -112,6 +113,23 @@ export default {
       // 选中删除
       const cells = this.$graph.getSelectedCells()
       this.$graph.removeCells(cells)
+    },
+    runJSON() {
+      const cells = this.$graph.getCells()
+      cells.forEach(item => {
+        if (item instanceof Edge) {
+          item.attr({
+            line: {
+              stroke: '#1890ff',
+              strokeDasharray: 5,
+              targetMarker: 'classic',
+              style: {
+                animation: 'ant-line 30s infinite linear',
+              },
+            },
+          })
+        }
+      })
     }
   }
 };
@@ -158,6 +176,16 @@ export default {
     border: 1px solid #ddd;
     padding: 4px 8px;
     cursor: pointer;
+  }
+
+  .run {
+    background: #398dee;
+    color: #fff;
+    border-radius: 4px;
+    font-size: 12px;
+    padding: 4px 8px;
+    cursor: pointer;
+    margin: 0 0 0 10px;
   }
 }
 

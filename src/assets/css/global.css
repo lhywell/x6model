@@ -26,9 +26,30 @@ body {
     border: 1px dashed #5f95ff;
 }
 
+
+.x6-edge .connection {
+    stroke-linejoin: round;
+    fill: none;
+    stroke: red
+}
+
+.x6-edge .connection-wrap {
+    cursor: move;
+    opacity: 0;
+
+    stroke-linejoin: round;
+    stroke: red
+}
+
 @keyframes stroke {
     100% {
         stroke-dashoffset: -400;
+    }
+}
+
+@keyframes ant-line {
+    to {
+        stroke-dashoffset: -1000
     }
 }
 

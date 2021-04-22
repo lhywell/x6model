@@ -37,7 +37,7 @@ import FlowGraph from './Graph'
 import Modal from "./Modal";
 import Toolbar from './Toolbar/Toolbar.vue'
 
-import { Graph, Shape, Addon, DataUri } from '@antv/x6';
+import { Graph, Shape, Addon, DataUri, FunctionExt } from '@antv/x6';
 const { Stencil } = Addon
 const { BorderedImage } = Shape
 
@@ -246,6 +246,25 @@ export default {
       graph.on('node:click', ({ node }) => {
         reset()
       })
+
+      const container = document.getElementById('app-content')
+
+      graph.on(
+        'node:mouseenter',
+        FunctionExt.debounce(() => {
+          const ports = container.querySelectorAll(
+            '.x6-port-body'
+          )
+          this.showPorts(ports, true)
+        }),
+        500
+      )
+      graph.on('node:mouseleave', () => {
+        const ports = container.querySelectorAll(
+          '.x6-port-body'
+        )
+        this.showPorts(ports, false)
+      })
     },
     newImage(id, url, text) {
       return new BorderedImage({
@@ -282,6 +301,9 @@ export default {
                   stroke: '#31d0c6',
                   strokeWidth: 1,
                   fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
                 },
               },
             },
@@ -295,6 +317,9 @@ export default {
                   stroke: '#31d0c6',
                   strokeWidth: 1,
                   fill: '#fff',
+                  style: {
+                    visibility: 'hidden'
+                  }
                 },
               },
             },
@@ -311,7 +336,11 @@ export default {
         },
       })
     },
-
+    showPorts(ports, show) {
+      for (let i = 0, len = ports.length; i < len; i = i + 1) {
+        ports[i].style.visibility = show ? 'visible' : 'hidden'
+      }
+    },
     close() {
       this.showAttrConfig = false;
     },
