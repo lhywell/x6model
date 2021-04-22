@@ -1,4 +1,5 @@
 import { Graph } from '@antv/x6';
+import graphData from './data'
 
 export default class FlowGraph {
   constructor(opts) {
@@ -26,6 +27,7 @@ export default class FlowGraph {
       selecting: {
         enabled: true,
         showNodeSelectionBox: true,
+        className: 'my-selecting',
       },
       keyboard: {
         enabled: true, // 是否开启快捷键系统
@@ -150,6 +152,9 @@ export default class FlowGraph {
     this.graph = new Graph(option);
 
     this.graph.centerContent()
+
+    // 反序列化
+    this.graph.fromJSON(graphData);
 
     return this.graph
   }

@@ -1,0 +1,196 @@
+{
+    "cells": [
+    {
+        "attrs":
+        {
+            "body":
+            {
+                "magnet": false
+            },
+            "image":
+            {
+                "opacity": 1,
+                "xlink: href": "/table.svg"
+            },
+            "label":
+            {
+                "fill": "black",
+                "text": "",
+                "y": 34
+            },
+            "rect":
+            {
+                "stroke": "#108ee9",
+                "strokeWidth": 1
+            }
+        },
+        "data":
+        {
+            "id": "table-2"
+        },
+        "id": "9e8f5591-9776-4fe0-bb86-07c2250da50a",
+        "ports":
+        {
+            "groups":
+            {
+                "in":
+                {
+                    "attrs":
+                    {
+                        "circle":
+                        {
+                            "fill": "#fff",
+                            "magnet": true,
+                            "r": 4,
+                            "stroke": "#31d0c6",
+                            "strokeWidth": 1
+                        }
+
+                    },
+                    "position": "left"
+                },
+                "out":
+                {
+                    "attrs":
+                    {
+                        "circle":
+                        {
+                            "fill": "#fff",
+                            "magnet": true,
+                            "r": 4,
+                            "stroke": "#31d0c6",
+                            "strokeWidth": 1
+                        }
+
+                    },
+                    "position": "right"
+                }
+            },
+            "items": [
+            {
+                "group": "in",
+                "id": "port1"
+            },
+            {
+                "group": "out",
+                "id": "port2"
+            }]
+        },
+        "position":
+        {
+            "x": -560,
+            "y": -170
+        },
+        "shape": "image-bordered",
+        "size":
+        {
+            "width": 40,
+            "height": 40
+        },
+        "zIndex": 1
+    },
+    {
+        "attrs":
+        {
+            "body":
+            {
+                "magnet": false
+            },
+            "image":
+            {
+                "opacity": 1,
+                "xlink: href": "/cha.svg"
+            },
+            "label":
+            {
+                "fill": "black",
+                "text": "差集",
+                "y": 34
+            },
+            "rect":
+            {
+                "stroke": "#108ee9",
+                "strokeWidth": 1
+            }
+        },
+        "data":
+        {
+            "id": "image-5"
+        },
+        "id": "7f8c35c6-0640-498c-90ea-d75a2d62f014",
+        "ports":
+        {
+            "groups":
+            {
+                "in":
+                {
+                    "attrs":
+                    {
+                        "circle":
+                        {
+                            "fill": "#fff",
+                            "magnet": true,
+                            "r": 4,
+                            "stroke": "#31d0c6",
+                            "strokeWidth": 1
+                        }
+
+                    },
+                    "position": "left"
+                },
+                "out":
+                {
+                    "attrs":
+                    {
+                        "circle":
+                        {
+                            "fill": "#fff",
+                            "magnet": true,
+                            "r": 4,
+                            "stroke": "#31d0c6",
+                            "strokeWidth": 1
+                        }
+
+                    },
+                    "position": "right"
+                }
+            },
+            "items": [
+            {
+                "group": "in",
+                "id": "port1"
+            },
+            {
+                "group": "out",
+                "id": "port2"
+            }]
+        },
+        "position":
+        {
+            "x": -390,
+            "y": -140
+        },
+        "shape": "image-bordered",
+        "size":
+        {
+            "width": 40,
+            "height": 40
+        },
+        "zIndex": 2
+    },
+    {
+        "id": "915a314a-79a3-4773-b6a4-bb452703d06b",
+        "shape": "edge",
+        "source":
+        {
+            "cell": "9e8f5591-9776-4fe0-bb86-07c2250da50a",
+            "port": "port2"
+        },
+        "target":
+        {
+            "cell": "7f8c35c6-0640-498c-90ea-d75a2d62f014",
+            "port": "port1"
+        },
+        "zIndex": 3
+    }]
+}
