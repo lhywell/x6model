@@ -1,6 +1,7 @@
 <template>
   <div class="tool-bar">
     <i @click="clear" class="iconfont iconqingchu" title="清除"></i>
+    <i @click="deleteCell" class="el-icon-delete" title="删除节点|边"></i>
     <span class="line"></span>
     <i @click="undo" class="iconfont iconundo" title="撤销"></i>
     <i @click="redo" class="iconfont iconredo" title="重做"></i>
@@ -103,8 +104,14 @@ export default {
       this.$graph.printPreview()
     },
     toJSON() {
+      // 序列化
       console.log(this.$graph.toJSON())
       // graph.fromJSON({cells:[graph.toJSON().cells[0],graph.toJSON().cells[1]]})
+    },
+    deleteCell() {
+      // 选中删除
+      const cells = this.$graph.getSelectedCells()
+      this.$graph.removeCells(cells)
     }
   }
 };
