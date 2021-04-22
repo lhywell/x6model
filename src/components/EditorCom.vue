@@ -2,7 +2,7 @@
   <div class="editor">
     <h1>战法模型</h1>
     <div class="content">
-      <div class="app-stencil" ref="stencilContainer"> </div>
+      <div class="app-stencil" id="app-stencil" ref="stencilContainer"> </div>
       <div class="panel">
         <Toolbar></Toolbar>
         <div class="app-content" id="app-content" ref="x6Editor"></div>
@@ -37,10 +37,6 @@ import FlowGraph from './Graph'
 import Modal from "./Modal";
 import Toolbar from './Toolbar/Toolbar.vue'
 
-import { Graph, Shape, Addon } from '@antv/x6';
-const { Stencil } = Addon
-const { BorderedImage } = Shape
-
 export default {
   data() {
     return {
@@ -55,123 +51,9 @@ export default {
   },
   methods: {
     initRight() {
-
-      // let g = new FlowGraph()
       let graph = FlowGraph.init();
 
-      this.initStencil(graph);
-
-
       Vue.prototype.$graph = graph;
-
-    },
-    initStencil(graph) {
-      const stencil = new Stencil({
-        title: '战法模型',
-        target: graph,
-        // search: true,
-        collapsable: true,
-        stencilGraphWidth: 200,
-        stencilGraphHeight: 280,
-        groups: [{
-          name: 'group1',
-          title: '数据源',
-        }, {
-          name: 'group2',
-          title: '基础模型',
-        }],
-      })
-
-      this.$refs.stencilContainer.appendChild(stencil.container)
-
-      let path = process.env.NODE_ENV === 'production' ?
-        '/x6model/dist/' :
-        '/';
-      const r1 = this.newImage('table-1', path + 'table.svg')
-      const r2 = this.newImage('table-2', path + 'table.svg')
-      const r3 = this.newImage('table-3', path + 'table.svg')
-      const r4 = this.newImage('table-4', path + 'table.svg')
-
-      const s3 = this.newImage('image-1', path + 'fliter.svg', '差集')
-      const s4 = this.newImage('image-2', path + 'jiao.svg', '交集')
-      const s5 = this.newImage('image-3', path + 'bing.svg', '并集')
-      const s1 = this.newImage('image-4', path + 'bu.svg', '补集')
-      const s2 = this.newImage('image-5', path + 'cha.svg', '差集')
-
-
-      stencil.load([r1, r2, r3, r4], 'group1')
-      stencil.load([s1, s2, s3, s4, s5], 'group2')
-    },
-
-    newImage(id, url, text) {
-      return new BorderedImage({
-        shape: 'image-bordered',
-        width: 40,
-        height: 40,
-        data: {
-          id: id
-        },
-        attrs: {
-          rect: { stroke: '#108ee9', strokeWidth: 1 },
-          image: {
-            opacity: 1, // 设置为透明避免闪动，图片加载完成后设置为 1
-            'xlink:href': url,
-          },
-          body: {
-            magnet: false,
-          },
-          label: {
-            text: text || '',
-            fill: 'black',
-            y: 34,
-          },
-        },
-        ports: {
-          groups: {
-            // 输入链接桩群组定义
-            in: {
-              position: 'left',
-              attrs: {
-                circle: {
-                  r: 4,
-                  magnet: true,
-                  stroke: '#31d0c6',
-                  strokeWidth: 1,
-                  fill: '#fff',
-                  style: {
-                    visibility: 'hidden'
-                  }
-                },
-              },
-            },
-            // 输出链接桩群组定义
-            out: {
-              position: 'right',
-              attrs: {
-                circle: {
-                  r: 4,
-                  magnet: true,
-                  stroke: '#31d0c6',
-                  strokeWidth: 1,
-                  fill: '#fff',
-                  style: {
-                    visibility: 'hidden'
-                  }
-                },
-              },
-            },
-          },
-          items: [{
-              id: 'port1',
-              group: 'in',
-            },
-            {
-              id: 'port2',
-              group: 'out',
-            }
-          ],
-        },
-      })
     },
     close() {
       this.showAttrConfig = false;
