@@ -125,4 +125,30 @@ export default {
   }
 }
 
+/*自定义HTML样式*/
+.zf-node-image{
+  text-align:center;
+  width:40px;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+
+  .zf-node-text{
+    color:rgb(127, 128, 158);
+    font-size:14px;
+    text-align: center;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 80px;
+    overflow: hidden;
+  }
+}
+
+.panel{
+  .zf-node-text{
+    width: auto;
+    overflow: visible;
+  }
+}
 </style>

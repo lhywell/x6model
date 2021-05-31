@@ -1,7 +1,7 @@
-import { Graph, Shape,DataUri, Addon,FunctionExt } from '@antv/x6';
+import { Graph, Shape, DataUri, Addon, FunctionExt } from '@antv/x6';
 import graphData from './data'
 const { Stencil } = Addon
-const { BorderedImage } = Shape
+const { BorderedImage, HTML } = Shape
 
 export default class FlowGraph {
   constructor(opts) {
@@ -171,12 +171,12 @@ export default class FlowGraph {
     const { graph } = this;
     // https://craig.is/killing/mice
     // mousetrap
-    graph.bindKey(['meta+d', 'ctrl+d'], e => {
+    graph.bindKey(['meta+d'], e => {
       graph.clearCells();
       return false
     }, "keyup")
 
-    graph.bindKey(['ctrl+z'], e => {
+    graph.bindKey(['meta+z'], e => {
       graph.undo();
       return false
     }, "keyup");
@@ -184,7 +184,7 @@ export default class FlowGraph {
     graph.bindKey(['meta+shift+z', 'ctrl+y'], e => {
       graph.redo();
       return false
-    })
+    }, "keyup")
 
     graph.bindKey(["ctrl+="], e => graph.zoom(0.1));
     graph.bindKey(["ctrl+-"], e => graph.zoom(-0.1));
@@ -281,36 +281,48 @@ export default class FlowGraph {
     //   }
     // });
 
-    // 增加选中Node|Edge样式
-    function reset() {
-      // graph.drawBackground({ color: '#fff' })
-      const nodes = graph.getNodes()
-      const edges = graph.getEdges()
 
-      nodes.forEach((node) => {
-        node.attr('rect/stroke', '#108ee9')
-      })
 
-      edges.forEach((edge) => {
-        edge.attr('line/stroke', '#000000')
-        // edge.prop('labels/0', {
-        //   attrs: {
-        //     body: {
-        //       stroke: '#7c68fc',
-        //     },
-        //   },
-        // })
-      })
-    }
-
+    // edge 节点点击事件
     graph.on('edge:click', ({ edge }) => {
-      reset()
+      this.reset(graph)
       edge.attr('line/stroke', 'orange')
     })
-    graph.on('node:click', ({ node }) => {
-      reset()
+
+    // node 节点点击事件
+    graph.on('node:click', ({ e, x, y, node, view }) => {
+      this.reset(graph)
+      console.log(e,x,y,node,view)
+
+
     })
 
+
+    this.portEvent(graph)
+
+  }
+  static reset(graph){
+    // 增加选中Node|Edge样式
+    const nodes = graph.getNodes()
+    const edges = graph.getEdges()
+
+    nodes.forEach((node) => {
+      node.attr('rect/stroke', '#108ee9')
+    })
+
+    edges.forEach((edge) => {
+      edge.attr('line/stroke', '#000000')
+      // edge.prop('labels/0', {
+      //   attrs: {
+      //     body: {
+      //       stroke: '#7c68fc',
+      //     },
+      //   },
+      // })
+    })
+  }
+  static portEvent(graph){
+    // 样式调整
     const container = document.getElementById('app-content')
 
     graph.on(
@@ -358,28 +370,63 @@ export default class FlowGraph {
     let path = process.env.NODE_ENV === 'production' ?
       '/x6model/dist/' :
       '/';
-    const r1 = this.newImage('table-1', path + 'table.svg')
-    const r2 = this.newImage('table-2', path + 'table.svg')
-    const r3 = this.newImage('table-3', path + 'table.svg')
-    const r4 = this.newImage('table-4', path + 'table.svg')
 
-    const s3 = this.newImage('image-1', path + 'fliter.svg', '差集')
-    const s4 = this.newImage('image-2', path + 'jiao.svg', '交集')
-    const s5 = this.newImage('image-3', path + 'bing.svg', '并集')
-    const s1 = this.newImage('image-4', path + 'bu.svg', '补集')
-    const s2 = this.newImage('image-5', path + 'cha.svg', '差集')
+    let x = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1];
+    let ary = [];
+    x.forEach((item,index)=>{
+      ary.push(this.newImage('table-'+index, 'table', path + 'table.svg', 'table-'+index+'bfawegawegasdgasdg'))
+    })
+    // const r1 = this.newImage('table-1', 'table', path + 'table.svg', 'table-1')
+    // const r2 = this.newImage('table-2', 'table', path + 'table.svg', 'table-2')
+    // const r3 = this.newImage('table-3', 'table', path + 'table.svg', 'table-3')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r5 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r6 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r7 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+    // const r4 = this.newImage('table-4', 'table', path + 'table.svg', 'table-4')
+
+    const s3 = this.newImage('image-1', 'filter', path + 'fliter.svg', '过滤')
+    const s4 = this.newImage('image-2', 'model', path + 'jiao.svg', '交集')
+    const s5 = this.newImage('image-3', 'model', path + 'bing.svg', '并集')
+    const s1 = this.newImage('image-4', 'model', path + 'bu.svg', '补集')
+    const s2 = this.newImage('image-5', 'model', path + 'cha.svg', '差集')
 
 
-    stencil.load([r1, r2, r3, r4], 'group1')
+    stencil.load(ary, 'group1')
     stencil.load([s1, s2, s3, s4, s5], 'group2')
   }
-  static newImage(id, url, text) {
-    return new BorderedImage({
-      shape: 'image-bordered',
+  static newImage(id, type, url, text) {
+    return new HTML({
+      shape: 'html',
       width: 40,
       height: 40,
       data: {
-        id: id
+        id: id,
+        type: type,
+        label: text
+      },
+      html() {
+        const wrap = document.createElement('div')
+        const label = document.createElement('div')
+        label.setAttribute('class', 'zf-node-text')
+        label.setAttribute('title', text)
+        const img = document.createElement('img')
+        wrap.setAttribute('class', 'zf-node-image')
+        img.src = url
+        img.width = '30'
+
+        label.innerText = text;
+        wrap.appendChild(img)
+        wrap.appendChild(label)
+
+        return wrap
       },
       attrs: {
         rect: { stroke: '#108ee9', strokeWidth: 1 },
@@ -390,7 +437,7 @@ export default class FlowGraph {
         body: {
           magnet: false,
         },
-        label: {
+        lable: {
           text: text || '',
           fill: 'black',
           y: 34,

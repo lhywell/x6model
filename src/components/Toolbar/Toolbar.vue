@@ -1,9 +1,13 @@
 <template>
   <div class="tool-bar">
-    <i @click="clear" class="iconfont iconqingchu" title="清除"></i>
+    <el-tooltip class="item" effect="dark" content="清除 (Cmd + D)" placement="top-start">
+      <i @click="clear" class="iconfont iconqingchu" title="清除"></i>
+    </el-tooltip>
     <i @click="deleteCell" class="el-icon-delete" title="删除节点|边"></i>
     <span class="line"></span>
-    <i @click="undo" class="iconfont iconundo" title="撤销"></i>
+    <el-tooltip class="item" effect="dark" content="清除 (Cmd + Shift + Z)" placement="top-start">
+      <i @click="undo" class="iconfont iconundo" title="撤销"></i>
+    </el-tooltip>
     <i @click="redo" class="iconfont iconredo" title="重做"></i>
     <span class="line"></span>
     <i @click="
@@ -29,11 +33,14 @@
 </template>
 <script>
 import { DataUri, Edge } from '@antv/x6'
+import _ from 'lodash'
 
 export default {
   name: 'Toolbar',
   data() {
-    return {};
+    return {
+      oparation:{}
+    };
   },
   mounted() {},
   methods: {
@@ -106,7 +113,71 @@ export default {
     },
     toJSON() {
       // 序列化
-      console.log(this.$graph.toJSON())
+
+      let json = this.$graph.toJSON()
+      console.log(json)
+      let newJson = _.cloneDeep(json)
+      // let pc = this.$graph.parseJSON(cells)
+      // getCells返回画布中所有节点和边。
+      let cells = this.$graph.getCells()
+      console.log(this.$graph.getCells())
+      let ary = [];
+      // 更改结构id,data,node
+      cells.forEach(item => {
+        let data = item.store.data.data;
+        ary.push({
+          id: item.id,
+          label: data ? data.label : '',
+          data: data,
+          node: item
+        })
+      })
+      console.log(ary)
+      // 得到所有的操作节点
+      let operationNode = []
+      ary.forEach(item => {
+        if (item.data && item.data.type === 'model' && item.label !== '过滤') {
+          operationNode.push(item)
+          let cell = this.$graph.getPredecessors(item.node)
+          console.log(cell)
+
+          if (cell.length != 2) {
+            this.$message.error(item.label + "操作节点非法操作")
+            let index = newJson['cells'].findIndex(c => {
+              return c.id === item.id
+            })
+            newJson['cells'][index].data.connect = cell
+          } else {
+            let index = newJson['cells'].findIndex(c => {
+              return c.id === item.id
+            })
+            newJson['cells'][index].data.connect = cell
+          }
+        }
+        if (item.data && item.data.type === 'model' && item.label === '过滤') {
+          operationNode.push(item)
+          let cell = this.$graph.getPredecessors(item.node)
+          console.log(cell)
+
+          if (cell.length != 1) {
+            this.$message.error(item.label + "操作节点非法操作")
+          } else {
+            let index = newJson['cells'].findIndex(c => {
+              return c.id === item.id
+            })
+            newJson['cells'][index].data.connect = cell
+          }
+        }
+      })
+
+      console.log(newJson)
+      // let cell = this.$graph.getCellById('ca8d50fe-30e5-4a51-ac5f-726737006727')
+      //  console.log(operationNode,cell)
+
+      //  let y = this.$graph.isNode(cell)
+      //  console.log(y)
+      // 返回节点的前序节点，即从根节点开始连接到指定节点的节点。
+      // getPredecessors
       // graph.fromJSON({cells:[graph.toJSON().cells[0],graph.toJSON().cells[1]]})
     },
     deleteCell() {
